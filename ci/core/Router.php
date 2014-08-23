@@ -273,7 +273,7 @@ class CI_Router {
 		{
 			return $segments;
 		}
-
+        
 		// Is the controller in a sub-folder?
 		if (is_dir(APPPATH.'controllers/'.$segments[0]))
 		{
@@ -342,7 +342,6 @@ class CI_Router {
 
 			return $x;
 		}
-
 
 		// Nothing else to do at this point but show a 404
 		show_404($segments[0]);

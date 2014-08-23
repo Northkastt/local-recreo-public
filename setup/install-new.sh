@@ -1,10 +1,13 @@
 #!/bin/bash
 
 dbUser="root"
-dbName="Recreo4"
+dbName="Recreo5"
 dbFile="recreo_2015.sql.gz"
 dbUnzippedFile="dbFile.sql"
 cleanFile="clean-data.sql"
+virtualHostFile="/etc/nginx/sites-enabled/recreo.public"
+tagVersion="1.0.0"
+tempFolder="temp-recreo-public-v$tagVersion"
 
 mysql -u $dbUser -h localhost -p'1qsYm_R00tP4$4wd' -Bse "CREATE DATABASE $dbName"
 echo "Database $dbName has been created"
@@ -18,8 +21,6 @@ mysql -u $dbUser -h localhost -p'1qsYm_R00tP4$4wd' $dbName < $dbUnzippedFile
 
 echo "done"
 
-tagVersion = "1.0.0"
-
 #echo "Please specify the tag version you want to install: (ie. 1.0.0): "
 #read tagVersion
 
@@ -27,9 +28,9 @@ tagVersion = "1.0.0"
 
 echo "Installing Recreo Public $tagVersion"
 
-tempFolder = "temp-recreo-public-v$tagVersion"
+mkdir $tempFolder
 
-unzip "local-recreo-public-v$tagVersion.zip" -d $tempFolder
+unzip local-recreo-public-v$tagVersion.zip -d $tempFolder
 
 chown -R npadmin:www-data $tempFolder
 chgrp -R www-data $tempFolder
@@ -37,13 +38,12 @@ chmod -R g+wxrs $tempFolder
 
 echo "Creating files"
 
-rsync -av "$tempFolder/local-recreo-public-$tagVersion/* /usr/share/nginx/recreo.public/
-
 mkdir /usr/share/nginx/recreo.public/
+rsync -av --exclude 'setup' $tempFolder/local-recreo-public-$tagVersion/* /usr/share/nginx/recreo.public/
 
 echo "Creating virtual host"
-touch /etc/nginx/sites-enabled/recreo.public
-cat virtual_host.txt >> /etc/nginx/sites-enabled/recreo.public
+touch $virtualHostFile
+cat virtual_host >> $virtualHostFile
 
 echo "Deleting temp files"
 
